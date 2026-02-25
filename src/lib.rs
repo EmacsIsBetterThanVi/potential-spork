@@ -1,22 +1,22 @@
 pub mod emulator_core{
     pub trait Memory {
-    	fn get_8(&self, addr: u64) -> u8;
-	fn set_8(&mut self, addr: u64, value: u8);
-	fn get_16(&self, addr: u64, big: bool) -> u16{
+    	fn get_8(&self, addr: usize) -> u8;
+	fn set_8(&mut self, addr: usize, value: u8);
+	fn get_16(&self, addr: usize, big: bool) -> u16{
 	    if (big){
 	       return ((self.get_8(addr) as u16)<<8) | (self.get_8(addr+1) as u16);
 	    } else {
 	       return ((self.get_8(addr+1) as u16)<<8) | (self.get_8(addr) as u16);
 	    }
 	 }
-	 fn get_32(&self, addr: u64, big: bool) -> u32{
+	 fn get_32(&self, addr: usize, big: bool) -> u32{
 	    if (big){
 	       return ((self.get_8(addr) as u32)<<24) | ((self.get_8(addr+1) as u32)<<16)| ((self.get_8(addr+2) as u32)<<8) | (self.get_8(addr+3) as u32);
 	    } else {
 	    	    return ((self.get_8(addr+3) as u32)<<24) | ((self.get_8(addr+2) as u32)<<16)| ((self.get_8(addr+1) as u32)<<8) | (self.get_8(addr) as u32) ;
 	    }
 	 }
-	 fn get_64(&self, addr: u64, big: bool) -> u64{
+	 fn get_64(&self, addr: usize, big: bool) -> u64{
 	    if (big){
 	       return ((self.get_8(addr) as u64)<<56) + ((self.get_8(addr+1) as u64)<<48) | ((self.get_8(addr+2) as u64)<<40)| ((self.get_8(addr+3) as u64)<<32) | ((self.get_8(addr+4) as u64)<<24) | ((self.get_8(addr+5) as u64)<<16)| ((self.get_8(addr+6) as u64)<<8) | (self.get_8(addr+7) as u64);
 	    } else {
@@ -25,49 +25,49 @@ pub mod emulator_core{
 	 }
     }
     pub struct RAM {
-    	data: [u8]
+    	data: Vec<u8>
     }
     pub struct ROM{
-    	data: [u8]
+    	data: Vec<u8>
     }
     impl Memory for RAM{
-	 fn get_8(&self, addr: u64) -> u8{
+	 fn get_8(&self, addr: usize) -> u8{
 	    self.data[addr]
 	 }
-	 fn set_8(&mut self, addr: u64, value: u8){
+	 fn set_8(&mut self, addr: usize, value: u8){
 	    self.data[addr] = value;
 	 }
-    }
-    impl RAM{
-    	 const fn new(length: u64) -> Self {
+   }
+   impl RAM{
+	 fn new(length: usize) -> Self {
 	    RAM{
-	    	data: [0; length]
+	    	data: vec![0; length]
 	    }
 	 }
     }
     impl Memory for ROM {
-	 fn get_8(&self, addr: u64) -> u8{
+	 fn get_8(&self, addr: usize) -> u8{
 	    self.data[addr]
 	 }
-	 fn set_8(&mut self, addr: u64, value: u8){
+	 fn set_8(&mut self, addr: usize, value: u8){
 	 
 	 }
     }
     impl ROM {
-    const fn new(length: u64) -> Self {
+    	 fn new(length: usize) -> Self {
 	    ROM{
-	    	data: [0; length]
+	    	data: vec![0; length]
 	    }
 	 }
     }
-    pub struct MemMap {
-    	regions: Vec<dyn Memory>,
+    pub struct MemMap<'a>{
+    	regions: Vec<&'a dyn Memory>,
 	big_endian: bool
     }
-    impl MemMap{
+    impl MemMap<'_>{
     	 fn new(big_endian: bool) -> Self{
 	    Self {
-	    	 regions: Vec::<dyn Memory>::new(),
+	    	 regions: Vec::<&dyn Memory>::new(),
 		 big_endian
 	    }
 	 }
