@@ -1,2 +1,5 @@
+#![allow(unused)]
 use potentialsporklib;
-fn main() {}
+fn main() {
+   println!("DEBUG")
+}
