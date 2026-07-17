@@ -1,10 +1,10 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 pub trait CPU<'a> {
-  fn reset(&self);
-  fn decode(&self);
-  fn execute(&self);
-  fn ramRegister(&self);
+  fn reset(&mut self);
+  fn decode(&mut self);
+  fn execute(&mut self);
+  fn ramRegister(&mut self);
   fn init(ram: &'a mut dyn Memory) -> Self;
 }
 pub trait Memory {

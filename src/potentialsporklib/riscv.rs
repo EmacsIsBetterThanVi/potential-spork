@@ -1,10 +1,9 @@
 use crate::Memory;
 use crate::CPU;
-pub struct Isa32<'a>{
+use std::mem::ManuallyDrop;
+struct Isa32Core {
     ebreak: u32,
     ecall: u32,
-    paused: bool,
-    step: bool,
     pc: u32,
     ra: u32,
     sp: u32,
@@ -37,23 +36,37 @@ pub struct Isa32<'a>{
     t4: u32,
     t5: u32,
     t6: u32,
+}
+pub struct Isa32<'a>{
+    core: Isa32Core, 
+    paused: bool,
+    step: bool,
     ram: &'a mut dyn Memory
 }
+macro_rules! addrWrite {
+    ( $($x:expr), *)
+}
 impl<'a> CPU<'a> for Isa32<'a>{
-    fn reset(&self){
+    fn reset(&mut self){
+	unsafe {
+	   let baddr: Isa32Array = Isa32Array { obj: ManuallyDrop::new(self.core) };
+       	   for addr in 8..(8+(32*4)) {
+	       
+           }
+       }
     }
-    fn decode(&self){
+    fn decode(&mut self){
+       
     }
-    fn execute(&self){
+    fn execute(&mut self){
     }
-    fn ramRegister(&self){
+    fn ramRegister(&mut self){
     }
     fn init(ram: &'a mut dyn Memory) -> Self{
-       Self {
+	Self {
+	    core: Isa32Core {
     ebreak: 0u32,
     ecall: 0u32,
-    paused: false,
-    step: false,
     pc: 0u32,
     ra: 0u32,
     sp: 0u32,
@@ -85,7 +98,10 @@ impl<'a> CPU<'a> for Isa32<'a>{
     t3: 0u32,
     t4: 0u32,
     t5: 0u32,
-    t6: 0u32,
+		t6: 0u32,
+	    },
+    paused: false,
+    step: false,
     ram,
        }
     }
